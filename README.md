@@ -21,3 +21,4 @@ To use this template, follow these steps:
 module.exports.help  = {
 name: "cmd"
 }
+```
