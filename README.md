@@ -7,9 +7,11 @@ This is a Telegram bot template implemented in **Node.js**. You are welcome to u
 
 To use this template, follow these steps:
 
-1. Make a Telegram bot and paste the bot token in the `token` variable in the `bot.js` file.
-2. Change the implementation in `/commands/Command template.js` to create your own command.
-3. To make more commands, duplicate the command template in the same folder.
+1. First you should install all modules "npm install"
+1. Make file `.env` and make variable `TOKEN_KEY = ` and put your token.
+2. Make a Telegram bot and paste the bot token in the `token` variable in the `bot.js` file.
+3. Change the implementation in `/commands/Command template.js` to create your own command.
+4. To make more commands, duplicate the command template in the same folder.
 
 ### Notes
 
