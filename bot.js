@@ -1,44 +1,39 @@
-const TelegramBot= require('node-telegram-bot-api');
-const fs = require('fs');
+import TelegramBot from 'node-telegram-bot-api';
+import * as dotenv from 'dotenv';
+import fs from 'fs';
 
-const token = '5714804476:AAHomKVnXzCQAsHX_fmgWrbxkSN6K_vBg3E';
+dotenv.config();
 
-const client = new TelegramBot(token, {polling: true});
+const token = process.env.TOKEN_KEY;
 
+const client = new TelegramBot(token, { polling: true });
 
 const Commands = new Map();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
 
-  console.log(file + ": Loaded.")
-  Commands[command.help.name] = command
-}
+const loadCommands = async () => {
+  const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
+  for (const file of commandFiles) {
+    const { default: command } = await import(`./commands/${file}.js`);
 
+    console.log(file + ': Loaded.');
+    Commands[command.help.name] = command;
+  }
+};
 
-let prefix = '/'
+let prefix = '/';
 
 client.on('message', (message) => {
+  if (message.text.startsWith(prefix)) {
+    let messageArray = message.text.split(' ');
+    let command = messageArray[0];
+    let args = messageArray.slice(1);
+    let cmd = Commands[command.slice(prefix.length)];
 
-    if(message.text.startsWith(prefix))
-    {
-        let messageArray = message.text.split(" ");
-        let command = messageArray[0];
-        let args = messageArray.slice(1);
-        let cmd = Commands[command.slice(prefix.length)];
-
-        if(cmd)
-        {
-            cmd.run(client, message, args);
-        }
-        else
-        {
-            client.sendMessage(message.from.id, "Command was not found!");
-        }
-
-        return;
-
-    }
+    cmd && cmd.run(client, message, args);
+    !cmd && client.sendMessage(message.from.id, 'Command was not found!');
+  }
 });
 
-client.on("polling_error", console.log);
+loadCommands().catch(console.error);
+
+client.on('polling_error', console.log);
